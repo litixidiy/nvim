@@ -125,6 +125,19 @@ return {
 					end,
 				})
 			end,
+
+			["clangd"] = function()
+				local lspconfig = require("lspconfig")
+				lspconfig["clangd"].setup({
+					capabilities = capabilities,
+					cmd = {
+						"clangd",
+						"--header-insertion=never", -- optional: avoid auto-inserting headers
+						"--query-driver=/opt/homebrew/bin/g++,/opt/homebrew/bin/clang++", -- for Mac
+					},
+				})
+			end,
+
 			["graphql"] = function()
 				-- configure graphql language server
 				lspconfig["graphql"].setup({
