@@ -1,13 +1,10 @@
 return {
-	"williamboman/mason.nvim",
+	"mason-org/mason.nvim",
 	dependencies = {
-		"williamboman/mason-lspconfig.nvim",
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		"mason-org/mason-lspconfig.nvim",
 	},
 	config = function()
 		local mason = require("mason")
-		local mason_lspconfig = require("mason-lspconfig")
-		local mason_tool_installer = require("mason-tool-installer")
 
 		mason.setup({
 			ui = {
@@ -18,9 +15,14 @@ return {
 				},
 			},
 		})
+		require("mason-lspconfig").setup({
 
-		mason_lspconfig.setup({
-			-- list of servers for mason to install, now including rust_analyzer
+			automatic_enable = {
+				exclude = {
+					"rust_analyzer",
+					"ts_ls",
+				},
+			},
 			ensure_installed = {
 				"html",
 				"cssls",
@@ -30,18 +32,6 @@ return {
 				"emmet_ls",
 				"prismals",
 				"pyright",
-			},
-		})
-
-		mason_tool_installer.setup({
-			ensure_installed = {
-				"prettier", -- prettier formatter
-				"stylua", -- lua formatter
-				"isort", -- python formatter
-				"black", -- python formatter
-				"pylint",
-				"eslint_d",
-				"codelldb", -- Debug adapter for Rust
 			},
 		})
 	end,

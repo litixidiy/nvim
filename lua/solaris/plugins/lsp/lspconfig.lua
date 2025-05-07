@@ -15,25 +15,24 @@ return {
 	},
 	config = function()
 		vim.g.rustaceanvim = {
+			-- Plugin configuration
+			tools = {},
+			-- LSP configuration
 			server = {
-				cmd = function()
-					local mason_registry = require("mason-registry")
-					if mason_registry.is_installed("rust-analyzer") then
-						local ra = mason_registry.get_package("rust-analyzer")
-						local ra_filename = ra:get_receipt():get().links.bin["rust-analyzer"]
-						return { ("%s/%s"):format(ra:get_install_path(), ra_filename or "rust-analyzer") }
-					else
-						return { "rust-analyzer" }
-					end
+				on_attach = function(client, bufnr)
+					-- you can also put keymaps in here
 				end,
+				default_settings = {
+					-- rust-analyzer language server configuration
+					["rust-analyzer"] = {},
+				},
 			},
+			-- DAP configuration
+			dap = {},
 		}
 
 		-- import lspconfig plugin
 		local lspconfig = require("lspconfig")
-
-		-- import mason_lspconfig plugin
-		local mason_lspconfig = require("mason-lspconfig")
 
 		-- import cmp-nvim-lsp plugin
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
@@ -92,92 +91,23 @@ return {
 		-- used to enable autocompletion (assign to every lsp server config)
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 
-		-- Change the Diagnostic symbols in the sign column (gutter)
-		-- (not in youtube nvim video)
-		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-		for type, icon in pairs(signs) do
-			local hl = "DiagnosticSign" .. type
-			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-		end
+		lspconfig.clangd.setup({
+			capabilities = capabilities,
+			cmd = {
+				"clangd",
+				"--header-insertion=never",
+				"--query-driver=/opt/homebrew/bin/g++,/opt/homebrew/bin/clang++",
+			},
+		})
 
-		mason_lspconfig.setup_handlers({
-
-			["rust_analyzer"] = function() end,
-
-			-- default handler for installed servers
-			function(server_name)
-				lspconfig[server_name].setup({
-					capabilities = capabilities,
-				})
-			end,
-			["svelte"] = function()
-				-- configure svelte server
-				lspconfig["svelte"].setup({
-					capabilities = capabilities,
-					on_attach = function(client, bufnr)
-						vim.api.nvim_create_autocmd("BufWritePost", {
-							pattern = { "*.js", "*.ts" },
-							callback = function(ctx)
-								-- Here use ctx.match instead of ctx.file
-								client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-							end,
-						})
-					end,
-				})
-			end,
-
-			["clangd"] = function()
-				local lspconfig = require("lspconfig")
-				lspconfig["clangd"].setup({
-					capabilities = capabilities,
-					cmd = {
-						"clangd",
-						"--header-insertion=never", -- optional: avoid auto-inserting headers
-						"--query-driver=/opt/homebrew/bin/g++,/opt/homebrew/bin/clang++", -- for Mac
-					},
-				})
-			end,
-
-			["graphql"] = function()
-				-- configure graphql language server
-				lspconfig["graphql"].setup({
-					capabilities = capabilities,
-					filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-				})
-			end,
-			["emmet_ls"] = function()
-				-- configure emmet language server
-				lspconfig["emmet_ls"].setup({
-					capabilities = capabilities,
-					filetypes = {
-						"html",
-						"typescriptreact",
-						"javascriptreact",
-						"css",
-						"sass",
-						"scss",
-						"less",
-						"svelte",
-					},
-				})
-			end,
-			["lua_ls"] = function()
-				-- configure lua server (with special settings)
-				lspconfig["lua_ls"].setup({
-					capabilities = capabilities,
-					settings = {
-						Lua = {
-							-- make the language server recognize "vim" global
-							diagnostics = {
-								globals = { "vim" },
-							},
-							completion = {
-								callSnippet = "Replace",
-							},
-						},
-					},
-				})
-			end,
+		lspconfig.lua_ls.setup({
+			capabilities = capabilities,
+			settings = {
+				Lua = {
+					diagnostics = { globals = { "vim" } },
+					completion = { callSnippet = "Replace" },
+				},
+			},
 		})
 	end,
 }
