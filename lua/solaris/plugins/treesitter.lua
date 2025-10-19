@@ -11,6 +11,7 @@ return {
 			highlight = {
 				enable = true,
 			},
+
 			-- enable indentation
 			indent = { enable = true },
 			rainbow = {
@@ -26,7 +27,6 @@ return {
 				"yaml",
 				"html",
 				"css",
-				"prisma",
 				"markdown",
 				"markdown_inline",
 				"graphql",

@@ -16,6 +16,10 @@ return {
 					{ "filetype" },
 				},
 			},
+			options = {
+				--- @usage 'rose-pine' | 'rose-pine-alt'
+				theme = "rose-pine",
+			},
 		})
 	end,
 }

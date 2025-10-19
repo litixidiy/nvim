@@ -6,13 +6,7 @@ return {
 		{ "antosha417/nvim-lsp-file-operations", config = true },
 		{ "folke/neodev.nvim", opts = {} },
 	},
-	opts = {
-		setup = {
-			rust_analyzer = function()
-				return true
-			end,
-		},
-	},
+	opts = {},
 	config = function()
 		vim.g.rustaceanvim = {
 			-- Plugin configuration
@@ -30,9 +24,6 @@ return {
 			-- DAP configuration
 			dap = {},
 		}
-
-		-- import lspconfig plugin
-		local lspconfig = require("lspconfig")
 
 		-- import cmp-nvim-lsp plugin
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
@@ -88,26 +79,16 @@ return {
 			end,
 		})
 
-		-- used to enable autocompletion (assign to every lsp server config)
-		local capabilities = cmp_nvim_lsp.default_capabilities()
-
-		lspconfig.clangd.setup({
-			capabilities = capabilities,
+		vim.lsp.config.clangd = {
 			cmd = {
 				"clangd",
 				"--header-insertion=never",
 				"--query-driver=/opt/homebrew/bin/g++,/opt/homebrew/bin/clang++",
 			},
-		})
+			root_markers = { "compile_commands.json", "compile_flags.txt" },
+			filetypes = { "c", "cpp" },
+		}
 
-		lspconfig.lua_ls.setup({
-			capabilities = capabilities,
-			settings = {
-				Lua = {
-					diagnostics = { globals = { "vim" } },
-					completion = { callSnippet = "Replace" },
-				},
-			},
-		})
+		vim.lsp.enable({ "clangd" })
 	end,
 }

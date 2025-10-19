@@ -20,7 +20,6 @@ return {
 			automatic_enable = {
 				exclude = {
 					"rust_analyzer",
-					"ts_ls",
 				},
 			},
 			ensure_installed = {
@@ -28,8 +27,6 @@ return {
 				"cssls",
 				"tailwindcss",
 				"lua_ls",
-				"graphql",
-				"emmet_ls",
 				"prismals",
 				"pyright",
 			},
